@@ -14,53 +14,41 @@ class Chord:
         'F#': 'Gb', 
         'G#': 'Ab', 
         'A#': 'Bb',
-        # b to #
-        'Db': 'C#',
-        'Eb': 'D#',
-        'Gb': 'F#', 
-        'Ab': 'G#',
-        'Bb': 'A#',
     }
 
     def __init__(self, name, notes=[], chromatics=[]):
         self.name = name
         self.notes = notes
         self.chromatics = chromatics
+    
+    def flatInterval(self, interval):
+        index = 0
+        if interval == 3:
+            index = 1
+        elif interval == 5:
+            index = 2
+        elif interval == 7 and len(self.notes) >= self.FOUR_NOTE:
+            index = 3
+        else:
+            return self
+        flat = self.chromatics.index(self.notes[index]) - 1
+        if flat < 0:
+            flat = len(self.chromatics) - 1
+        note = self.chromatics[flat]
+        if note in self.equivalents:
+            self.notes[index] = self.equivalents[note]
+        else:
+            self.notes[index] = note
+        return self
 
     def flatThird(self):
-        flat = self.chromatics.index(self.notes[1]) - 1
-        if flat < 0:
-            flat = self.chromatics[-1]
-        note = self.chromatics[flat]
-        if note in self.equivalents:
-            self.notes[1] = self.equivalents[note]
-        else:
-            self.notes[1] = note
-        return self
+        return self.flatInterval(3)
     
     def flatFifth(self):
-        flat = self.chromatics.index(self.notes[2]) - 1
-        if flat < 0:
-            flat = self.chromatics[-1]
-        note = self.chromatics[flat]
-        if note in self.equivalents:
-            self.notes[2] = self.equivalents[note]
-        else:
-            self.notes[2] = note
-        return self
+        return self.flatInterval(5)
     
     def flatSeventh(self):
-        if len(self.notes) < self.FOUR_NOTE:
-            return self
-        flat = self.chromatics.index(self.notes[3]) - 1
-        if flat < 0:
-            flat = self.chromatics[-1]
-        note = self.chromatics[flat]
-        if note in  self.equivalents:
-            self.notes[3] =  self.equivalents[note]
-        else:
-            self.notes[3] = note
-        return self
+        return self.flatInterval(7)
 
     def sharpFifth(self):
         sharp = self.chromatics.index(self.notes[2]) + 1

@@ -1,11 +1,24 @@
+from enum import Enum
+
 from Chord import Chord
 
 # Declaring all constants
 OCTAVE = 8
 CHROMATIC = 12
-INTERVALS = {
+# 1 stands for semitone, 2 for whole tone
+SCALES = {
     'major': [2, 2, 1, 2, 2, 2, 1],
     'natural_minor': [2, 1, 2, 2, 1, 2, 2],
+}
+# each mode value stands for the interval to start on for key
+MODES = {
+    'ionian': 1,
+    'dorian': 2,
+    'phrygian': 3,
+    'lydian': 4,
+    'mixolydian': 5,
+    'aeolian': 6,
+    'locrian': 7,
 }
 MAJOR_FORMULA = {
     'maj': [1, 3, 5],
@@ -72,14 +85,18 @@ def chromatic(root):
     """Returns the chromatic notes given the root note"""
     notes = sharp_notes if root in sharps else flat_notes
     start = notes.index(root)
-    return notes[start:] + notes[:start+1]
+    return notes[start:] + notes[:start]
 
 # test
 # print("C chromatic: ", chromatic('C'))
 # print("F chromatic: ", chromatic('F'))
 
 # SCALES
-
+# TODO come up with a Scale object representation for easy construction of 
+# scales based on major scale. The current method works but it would be more
+# intuitive from music theory perspective to do embellishments
+# For example a natural minor is 1 2 b3 4 5 b6 b7 
+# This is a major with b3, b6, b7
 def scale(root, scale_type='major'):
     """
     Returns the scale given root note. 
@@ -88,14 +105,14 @@ def scale(root, scale_type='major'):
     if root not in sharp_notes and root not in flat_notes: 
         print('Note does not exist!')
         return
-    if scale_type not in INTERVALS: 
+    if scale_type not in SCALES: 
         print('Scale does not exist or not yet supported!')
         return
-    interval = INTERVALS['major']
-    if scale_type == 'natural_minor':
-        interval = INTERVALS['natural_minor']
+    interval = SCALES[scale_type]
+    # TODO handle case where embellish are flats (minor scale for e.g.)
+    # this will be achieved if there is a Scale object representation
     indices = [0]
-    for i in interval:
+    for i in interval[:-1]:
         loc = indices[-1] + i
         if loc >= CHROMATIC:
             loc = loc - CHROMATIC
@@ -104,7 +121,36 @@ def scale(root, scale_type='major'):
     root_notes = chromatic(root)
     return [root_notes[i] for i in indices]
 # test
-# print("Eb natural minor: ", scale('Eb', 'natural_minor'))
+# print("C major: ", scale('C', 'major'))
+# print("C natural minor: ", scale('C', 'natural_minor'))
+# print("C dorian: ", scale('C', 'dorian'))
+
+def mode(key, mode_name='ionian'):
+    """
+    Returns the mode for the given key.
+
+    Keyword arguments:
+    key -- the key
+    mode_name -- the name of the mode (ionian if not supplied)
+    """
+    if mode_name not in MODES: 
+        print('Mode does not exist:', mode_name)
+        return
+    if key not in sharp_notes or key not in flat_notes:
+        print('Key does not exist:', key)
+        return
+    # for now, deque is only needed for this function; it makes it convenient
+    # to rotate based on index for mode
+    from collections import deque
+    index = MODES[mode_name]
+    major = deque(scale(key))
+    major.rotate(-(index-1))
+    return list(major)
+
+# test
+# print("Ionian mode in key of C", mode('C'))
+# print("Dorian mode in key of C", mode('C', 'dorian'))
+print("Lydian mode in key of C", mode('C', 'lydian'))
 
 def major(root, formula, interval=[]):
     """
@@ -118,7 +164,7 @@ def major(root, formula, interval=[]):
     if root not in sharp_notes and root not in flat_notes: 
         print('Note does not exist:', root)
         return
-    if formula not in MAJOR_FORMULA: 
+    if formula not in MAJOR_FORMULA:
         print('Chord does not exist or not yet supported!')
         return
     indices = [f-1 for f in MAJOR_FORMULA[formula]]
@@ -132,6 +178,7 @@ def major(root, formula, interval=[]):
 # test 
 # major('C', 'maj7').print()
 # major('F#', 'maj7').print()
+# major('Gb', 'maj7').print()
 # invalid chords
 # major('Fb', 'maj7').print()
 # major('Cb', 'maj7').print()

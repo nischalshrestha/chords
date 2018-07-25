@@ -1,6 +1,10 @@
 from enum import Enum
+import pandas as pd
+from itertools import cycle
 
 from Chord import Chord
+
+
 
 # Declaring all constants
 OCTAVE = 8
@@ -79,6 +83,9 @@ equivalents = {
     'Ab': 'G#',
     'Bb': 'A#',
 }
+GUITAR_STANDARD = ['E', 'A', 'D', 'G', 'B', 'E']
+NUM_STRINGS = 6
+NUM_FRETS = 21
 
 # TODO In future give back both versions that Chord can use to pretty print
 def chromatic(root):
@@ -91,9 +98,44 @@ def chromatic(root):
 # print("C chromatic: ", chromatic('C'))
 # print("F chromatic: ", chromatic('F'))
 
+def chromatic_cycle(key, num=1):
+    """
+    Returns a chromatic scale for a given number of notes.
+
+    key --- the key
+    num --- number of notes to return
+    """
+    chromatics = chromatic(key)
+    all_notes = []
+    count = 0
+    for n in cycle(chromatics):
+        if count < num:
+            all_notes.append(n)
+        else:
+            break
+        count = count + 1
+    return all_notes
+# test
+# print(chromatic_cycle(chromatic('E'), NUM_FRETS+1))
+
+def fretboard():
+    """
+    Returns a dataframe containing all notes for each of the guitar string, where
+    each row is a string and each column is a fret including the open notes.
+    """
+    fretboard = []
+    for i in range(NUM_STRINGS):
+        # NUM_FRETS + 1 because we are counting open string notes as well
+        notes_on_string = chromatic_cycle(GUITAR_STANDARD[i], NUM_FRETS+1)
+        fretboard.insert(0, notes_on_string)
+    return pd.DataFrame(data=fretboard)
+guitar_fretboard = fretboard()
+print(guitar_fretboard)
+
 # SCALES
 # TODO come up with a Scale object representation for easy construction of 
 # scales based on major scale. The current method works but it would be more
+
 # intuitive from music theory perspective to do embellishments
 # For example a natural minor is 1 2 b3 4 5 b6 b7 
 # This is a major with b3, b6, b7
@@ -150,7 +192,7 @@ def mode(key, mode_name='ionian'):
 # test
 # print("Ionian mode in key of C", mode('C'))
 # print("Dorian mode in key of C", mode('C', 'dorian'))
-print("Lydian mode in key of C", mode('C', 'lydian'))
+# print("Lydian mode in key of C", mode('C', 'lydian'))
 
 def major(root, formula, interval=[]):
     """

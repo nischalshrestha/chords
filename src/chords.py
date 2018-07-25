@@ -4,8 +4,6 @@ from itertools import cycle
 
 from Chord import Chord
 
-
-
 # Declaring all constants
 OCTAVE = 8
 CHROMATIC = 12
@@ -314,4 +312,11 @@ def notes_on_fretboard(notes, frets=NUM_FRETS, open=True):
     return df[df.iloc[:, start:frets].isin(notes)].iloc[:, start:frets].fillna('.')
 # test
 # show all notes of Cmaj on fretboard 
-print("Cmaj\n", notes_on_fretboard(major('C', 'maj').get_notes()).to_string())
+# print("Cmaj\n", notes_on_fretboard(major('C', 'maj').get_notes()).to_string())
+# print("Cmaj9\n", notes_on_fretboard(major('C', 'maj9').get_notes()).to_string())
+
+# major scale is good but contains notes isn't sufficient for other scales
+# print("C major scale\n", notes_on_fretboard(scale('C', 'major')).to_string())
+
+# TODO scale finder
+# print("Dorian mode in key of C\n", notes_on_fretboard(mode('C', 'dorian')).to_string())

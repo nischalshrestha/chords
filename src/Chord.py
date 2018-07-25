@@ -57,6 +57,9 @@ class Chord:
         note = self.chromatics[sharp]
         self.notes[2] = note
         return self
+
+    def get_notes(self):
+        return self.notes
     
     def print(self):
         print(self.name, ': ', self.notes)

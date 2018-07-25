@@ -118,20 +118,6 @@ def chromatic_cycle(key, num=1):
 # test
 # print(chromatic_cycle(chromatic('E'), NUM_FRETS+1))
 
-def fretboard():
-    """
-    Returns a dataframe containing all notes for each of the guitar string, where
-    each row is a string and each column is a fret including the open notes.
-    """
-    fretboard = []
-    for i in range(NUM_STRINGS):
-        # NUM_FRETS + 1 because we are counting open string notes as well
-        notes_on_string = chromatic_cycle(GUITAR_STANDARD[i], NUM_FRETS+1)
-        fretboard.insert(0, notes_on_string)
-    return pd.DataFrame(data=fretboard)
-guitar_fretboard = fretboard()
-print(guitar_fretboard)
-
 # SCALES
 # TODO come up with a Scale object representation for easy construction of 
 # scales based on major scale. The current method works but it would be more
@@ -194,6 +180,9 @@ def mode(key, mode_name='ionian'):
 # print("Dorian mode in key of C", mode('C', 'dorian'))
 # print("Lydian mode in key of C", mode('C', 'lydian'))
 
+# TODO create one interface so that we route to major/minor/dominant chords
+# otherwise it is cumbersome to have to call these functions for chord name
+# e.g. chord('Cmaj') 
 def major(root, formula, interval=[]):
     """
     Returns a major chord for given root note.
@@ -292,3 +281,37 @@ def dominant(root, formula, interval=[]):
 # dominant('Db', '7').print()
 # dominant('Db', '+').print()
 # dominant('Db', 'dim').print()
+
+def fretboard():
+    """
+    Returns a dataframe containing all notes for each of the guitar string, where
+    each row is a string and each column is a fret including the open notes.
+    """
+    fretboard = []
+    for i in range(NUM_STRINGS):
+        # NUM_FRETS + 1 because we are counting open string notes as well
+        notes_on_string = chromatic_cycle(GUITAR_STANDARD[i], NUM_FRETS+1)
+        fretboard.insert(0, notes_on_string)
+    return pd.DataFrame(data=fretboard)
+guitar_fretboard = fretboard()
+# print(guitar_fretboard)
+
+def notes_on_fretboard(notes, frets=NUM_FRETS, open=True):
+    """
+    Returns a dataframe containing the notes supplied given a
+    window of frets (for e.g. 4 frets)
+
+    notes --- the notes to find
+    frets --- number of frets to limits search
+    open --- whether to consider open notes or not
+    """
+    # add 1 because we need to consider open notes
+    frets = frets + 1
+    notes = list(notes) if type(notes) != 'list' else notes
+    df = guitar_fretboard
+    start = 0 if open else 1
+    # looks at specified fret window
+    return df[df.iloc[:, start:frets].isin(notes)].iloc[:, start:frets].fillna('.')
+# test
+# show all notes of Cmaj on fretboard 
+print("Cmaj\n", notes_on_fretboard(major('C', 'maj').get_notes()).to_string())

@@ -1,6 +1,7 @@
 from enum import Enum
 import pandas as pd
 from itertools import cycle
+from collections import deque
 
 from Chord import Chord
 
@@ -75,15 +76,25 @@ equivalents = {
     'G#': 'Ab', 
     'A#': 'Bb',
     # b to #
-    'Db': 'C#',
-    'Eb': 'D#',
-    'Gb': 'F#', 
-    'Ab': 'G#',
-    'Bb': 'A#',
+    # 'Db': 'C#',
+    # 'Eb': 'D#',
+    # 'Gb': 'F#', 
+    # 'Ab': 'G#',
+    # 'Bb': 'A#',
 }
 GUITAR_STANDARD = ['E', 'A', 'D', 'G', 'B', 'E']
 NUM_STRINGS = 6
 NUM_FRETS = 21
+
+# this is just a convenience function that's used for debugging for now
+def convert(notes):
+    actual = []
+    for n in notes:
+        if n in equivalents:
+            actual.append(equivalents[n])
+        else:
+            actual.append(n)
+    return actual
 
 # TODO In future give back both versions that Chord can use to pretty print
 def chromatic(root):
@@ -119,9 +130,8 @@ def chromatic_cycle(key, num=1):
 # SCALES
 # TODO come up with a Scale object representation for easy construction of 
 # scales based on major scale. The current method works but it would be more
-
 # intuitive from music theory perspective to do embellishments
-# For example a natural minor is 1 2 b3 4 5 b6 b7 
+# For example a natural minor is 1 2 b3 4 5 b6 b7
 # This is a major with b3, b6, b7
 def scale(root, scale_type='major'):
     """
@@ -140,8 +150,7 @@ def scale(root, scale_type='major'):
     indices = [0]
     for i in interval[:-1]:
         loc = indices[-1] + i
-        if loc >= CHROMATIC:
-            loc = loc - CHROMATIC
+        loc = loc - CHROMATIC if loc >= CHROMATIC else loc
         indices.append(loc)
     # print(indices)
     root_notes = chromatic(root)
@@ -165,9 +174,6 @@ def mode(key, mode_name='ionian'):
     if key not in sharp_notes or key not in flat_notes:
         print('Key does not exist:', key)
         return
-    # for now, deque is only needed for this function; it makes it convenient
-    # to rotate based on index for mode
-    from collections import deque
     index = MODES[mode_name]
     major = deque(scale(key))
     major.rotate(-(index-1))
@@ -178,9 +184,6 @@ def mode(key, mode_name='ionian'):
 # print("Dorian mode in key of C", mode('C', 'dorian'))
 # print("Lydian mode in key of C", mode('C', 'lydian'))
 
-# TODO create one interface so that we route to major/minor/dominant chords
-# otherwise it is cumbersome to have to call these functions for chord name
-# e.g. chord('Cmaj') 
 def major(root, formula, interval=[]):
     """
     Returns a major chord for given root note.
@@ -280,6 +283,33 @@ def dominant(root, formula, interval=[]):
 # dominant('Db', '+').print()
 # dominant('Db', 'dim').print()
 
+def chord(root, formula):
+    """
+    Returns the chord notes given the root note and formula
+
+    root --- the root note (for e.g. C)
+    formula --- the type of chord (for e.g. maj)
+    """
+    if root not in sharp_notes or root not in flat_notes: 
+        print('Root note does not exist!')
+    if formula in MAJOR_FORMULA:
+        return major(root, formula)
+    elif formula in MINOR_FORMULA:
+        return minor(root, formula)
+    elif formula in DOMINANT_FORMULA:
+        return dominant(root, formula)
+    else:
+        print('Chord does not exist or not yet supported!')
+
+# test
+# print('Cmaj', chord('C', 'maj').notes)
+# print('Cm', chord('C', 'min').notes)
+# print('C7', chord('C', '7').notes)
+# print('Cdim', chord('C', 'dim').notes)
+# print('C+', chord('C', '+').notes)
+
+# Fretboard
+
 def fretboard():
     """
     Returns a dataframe containing all notes for each of the guitar string, where
@@ -312,8 +342,8 @@ def notes_on_fretboard(notes, frets=NUM_FRETS, open=True):
     return df[df.iloc[:, start:frets].isin(notes)].iloc[:, start:frets].fillna('.')
 # test
 # show all notes of Cmaj on fretboard 
-# print("Cmaj\n", notes_on_fretboard(major('C', 'maj').get_notes()).to_string())
-# print("Cmaj9\n", notes_on_fretboard(major('C', 'maj9').get_notes()).to_string())
+# print("Cmaj\n", notes_on_fretboard(major('C', 'maj').notes).to_string())
+# print("Cmaj9\n", notes_on_fretboard(major('C', 'maj9').notes).to_string())
 
 # major scale is good but contains notes isn't sufficient for other scales
 # print("C major scale\n", notes_on_fretboard(scale('C', 'major')).to_string())

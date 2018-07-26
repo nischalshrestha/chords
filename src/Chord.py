@@ -5,6 +5,7 @@ class Chord:
     TRIAD = 3
     FOUR_NOTE = 4
     SEVENTH = 7
+
     # these will be used to convert between the representations based
     # on whether scale or chord adds accidentals (for e.g. min will use flat)
     equivalents = {
@@ -57,9 +58,6 @@ class Chord:
         note = self.chromatics[sharp]
         self.notes[2] = note
         return self
-
-    def get_notes(self):
-        return self.notes
     
     def print(self):
         print(self.name, ': ', self.notes)

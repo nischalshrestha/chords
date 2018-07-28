@@ -3,6 +3,7 @@ import unittest
 import sys
 sys.path = ['../src'] + sys.path
 import chords
+from constants import *
 
 class test_chords(unittest.TestCase):
 
@@ -12,7 +13,7 @@ class test_chords(unittest.TestCase):
     def test_major(self):
         # test a key with all formulas for now
         key = 'C'
-        major_formualas = chords.MAJOR_FORMULA
+        major_formualas = MAJOR_FORMULA
         expected = [
             ['C', 'E', 'G'],
             ['C', 'E', 'G', 'A'],
@@ -29,7 +30,7 @@ class test_chords(unittest.TestCase):
     def test_minor(self):
         # test a key with all formulas for now
         key = 'C'
-        minor_formulas = chords.MINOR_FORMULA
+        minor_formulas = MINOR_FORMULA
         expected = [
             ['C', 'Eb', 'G'],
             ['C', 'Eb', 'G', 'A'],
@@ -41,6 +42,27 @@ class test_chords(unittest.TestCase):
             ['C', 'Eb', 'G', 'A', 'D'],
             ['C', 'Eb', 'G', 'B'],
             ['C', 'Eb', 'G', 'B', 'D'],
+        ]
+        for i, m in enumerate(minor_formulas):
+            self.assertEqual(expected[i], chords.chord(key, m).notes)
+    
+    def test_dominant(self):
+        # test a key with all formulas for now
+        key = 'C'
+        minor_formulas = DOMINANT_FORMULA
+        expected = [
+            ['C', 'E', 'G', 'Bb'],
+            ['C', 'E', 'G', 'Bb', 'A'],
+            ['C', 'E', 'G', 'Bb', 'F'],
+            ['C', 'F', 'G', 'Bb'],
+            ['C', 'F', 'G', 'Bb', 'A'], 
+            ['C', 'E', 'G', 'Bb', 'D'],
+            ['C', 'E', 'G', 'Bb', 'D', 'F'],
+            ['C', 'E', 'G', 'Bb', 'D', 'A'],
+            ['C', 'E', 'G', 'Bb', 'F', 'A'],
+            ['C', 'E', 'G', 'Bb', 'D', 'F', 'A'],
+            ['C', 'Eb', 'Gb', 'A'],
+            ['C', 'E', 'G#']
         ]
         for i, m in enumerate(minor_formulas):
             self.assertEqual(expected[i], chords.chord(key, m).notes)

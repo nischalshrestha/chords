@@ -4,94 +4,14 @@ from itertools import cycle
 from collections import deque
 
 from Chord import Chord
-
-# Declaring all constants
-OCTAVE = 8
-CHROMATIC = 12
-# 1 stands for semitone, 2 for whole tone
-SCALES = {
-    'major': [2, 2, 1, 2, 2, 2, 1],
-    'natural_minor': [2, 1, 2, 2, 1, 2, 2],
-}
-# each mode value stands for the interval to start on for key
-MODES = {
-    'ionian': 1,
-    'dorian': 2,
-    'phrygian': 3,
-    'lydian': 4,
-    'mixolydian': 5,
-    'aeolian': 6,
-    'locrian': 7,
-}
-MAJOR_FORMULA = {
-    'maj': [1, 3, 5],
-    'maj6': [1, 3, 5, 6],
-    'maj7': [1, 3, 5, 7],
-    'maj9': [1, 3, 5, 7, 9],
-    'majadd9': [1, 3, 5, 9],
-    'maj6/9': [1, 3, 5, 6, 9],
-    'maj7/6': [1, 3, 5, 6, 7],
-    'maj13': [1, 3, 5, 7, 9, 13],
-}
-# This is the basic formula but the 3rd and 7th will receive flat accidental
-# by the minor method below
-MINOR_FORMULA = {
-    'min': [1, 3, 5],
-    'min6': [1, 3, 5, 6],
-    'min7': [1, 3, 5, 7],
-    'min9': [1, 3, 5, 7, 9],
-    'min11': [1, 3, 5, 7, 9, 11],
-    'min7/11': [1, 3, 5, 7, 11],
-    'minadd9': [1, 3, 5, 9],
-    'min6/9': [1, 3, 5, 6, 9],
-    'minmaj7': [1, 3, 5, 7],
-    'minmaj9': [1, 3, 5, 7, 9],
-}
-# Dominants which will receive accidentals by the dominant method below
-DOMINANT_FORMULA = {
-    '7': [1, 3, 5, 7],
-    '7/6': [1, 3, 5, 6, 7],
-    '7/11': [1, 3, 5, 7, 11],
-    '7sus4': [1, 4, 5, 7],
-    '7/6sus4': [1, 4, 5, 6, 7],
-    '9': [1, 3, 5, 7, 9],
-    '11': [1, 3, 5, 7, 9, 11],
-    '13': [1, 3, 5, 7, 9, 13],
-    '7/6/11': [1, 3, 5, 7, 11, 13],
-    '11/13': [1, 3, 5, 7, 9, 11, 13],
-    'dim': [1, 3, 5, 6], 
-    '+': [1, 3, 5],
-}
-sharps = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#']
-flats = ['F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb']
-sharp_notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-flat_notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
-# these will be used to convert between the representations based
-# on whether scale or chord adds accidentals (for e.g. min will use flat)
-equivalents = {
-    # # to b
-    'C#': 'Db', 
-    'D#': 'Eb', 
-    'F#': 'Gb', 
-    'G#': 'Ab', 
-    'A#': 'Bb',
-    # b to #
-    # 'Db': 'C#',
-    # 'Eb': 'D#',
-    # 'Gb': 'F#', 
-    # 'Ab': 'G#',
-    # 'Bb': 'A#',
-}
-GUITAR_STANDARD = ['E', 'A', 'D', 'G', 'B', 'E']
-NUM_STRINGS = 6
-NUM_FRETS = 21
+from constants import *
 
 # this is just a convenience function that's used for debugging for now
 def convert(notes):
     actual = []
     for n in notes:
-        if n in equivalents:
-            actual.append(equivalents[n])
+        if n in EQUIVALENTS:
+            actual.append(EQUIVALENTS[n])
         else:
             actual.append(n)
     return actual
@@ -99,7 +19,7 @@ def convert(notes):
 # TODO In future give back both versions that Chord can use to pretty print
 def chromatic(root):
     """Returns the chromatic notes given the root note"""
-    notes = sharp_notes if root in sharps else flat_notes
+    notes = SHARP_NOTES if root in SHARPS else FLAT_NOTES
     start = notes.index(root)
     return notes[start:] + notes[:start]
 
@@ -125,7 +45,7 @@ def chromatic_cycle(key, num=1):
         count = count + 1
     return all_notes
 # test
-# print(chromatic_cycle(chromatic('E'), NUM_FRETS+1))
+# print(chromatic_cycle('E', NUM_FRETS))
 
 # SCALES
 # TODO come up with a Scale object representation for easy construction of 
@@ -138,7 +58,7 @@ def scale(root, scale_type='major'):
     Returns the scale given root note. 
     Default is major scale if no scale is picked
     """
-    if root not in sharp_notes and root not in flat_notes: 
+    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
         print('Note does not exist!')
         return
     if scale_type not in SCALES: 
@@ -171,7 +91,7 @@ def mode(key, mode_name='ionian'):
     if mode_name not in MODES: 
         print('Mode does not exist:', mode_name)
         return
-    if key not in sharp_notes or key not in flat_notes:
+    if key not in SHARP_NOTES or key not in FLAT_NOTES:
         print('Key does not exist:', key)
         return
     index = MODES[mode_name]
@@ -193,7 +113,7 @@ def major(root, formula, interval=[]):
     formula -- the formula part of chord (e.g. maj7)
     interval -- optional custom list of interval to use (not used for now)
     """
-    if root not in sharp_notes and root not in flat_notes: 
+    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
         print('Note does not exist:', root)
         return
     if formula not in MAJOR_FORMULA:
@@ -224,7 +144,7 @@ def minor(root, formula, interval=[]):
     formula -- the formula part of chord (e.g. min9)
     interval -- optional custom list of interval to use
     """
-    if root not in sharp_notes and root not in flat_notes: 
+    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
         print('Note does not exist:', root)
         return
     if formula not in MINOR_FORMULA: 
@@ -258,7 +178,7 @@ def dominant(root, formula, interval=[]):
     formula -- the formula part of chord (e.g. min9)
     interval -- optional custom list of interval to use
     """
-    if root not in sharp_notes and root not in flat_notes: 
+    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
         print('Note does not exist!')
         return
     if formula not in DOMINANT_FORMULA: 
@@ -270,6 +190,7 @@ def dominant(root, formula, interval=[]):
             indices[i] = index - OCTAVE + 1
     root_notes = scale(root)
     notes = [root_notes[i] for i in indices]
+    
     chord = Chord(root+formula, notes, chromatic(root))
     # exceptions that don't contain a seventh or shouldn't flat it
     if '+' in formula:
@@ -290,7 +211,7 @@ def chord(root, formula):
     root --- the root note (for e.g. C)
     formula --- the type of chord (for e.g. maj)
     """
-    if root not in sharp_notes or root not in flat_notes: 
+    if root not in SHARP_NOTES or root not in FLAT_NOTES: 
         print('Root note does not exist!')
     if formula in MAJOR_FORMULA:
         return major(root, formula)

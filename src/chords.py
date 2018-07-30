@@ -58,7 +58,7 @@ def scale(root, scale_type='major'):
     Returns the scale given root note. 
     Default is major scale if no scale is picked
     """
-    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
+    if root not in (SHARP_NOTES + FLAT_NOTES):
         print('Note does not exist!')
         return
     if scale_type not in SCALES: 
@@ -91,7 +91,7 @@ def mode(key, mode_name='ionian'):
     if mode_name not in MODES: 
         print('Mode does not exist:', mode_name)
         return
-    if key not in SHARP_NOTES or key not in FLAT_NOTES:
+    if key not in (SHARP_NOTES + FLAT_NOTES):
         print('Key does not exist:', key)
         return
     index = MODES[mode_name]
@@ -104,7 +104,7 @@ def mode(key, mode_name='ionian'):
 # print("Dorian mode in key of C", mode('C', 'dorian'))
 # print("Lydian mode in key of C", mode('C', 'lydian'))
 
-def major(root, formula, interval=[]):
+def major(root, formula):
     """
     Returns a major chord for given root note.
 
@@ -113,7 +113,7 @@ def major(root, formula, interval=[]):
     formula -- the formula part of chord (e.g. maj7)
     interval -- optional custom list of interval to use (not used for now)
     """
-    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
+    if root not in (SHARP_NOTES + FLAT_NOTES):
         print('Note does not exist:', root)
         return
     if formula not in MAJOR_FORMULA:
@@ -135,7 +135,7 @@ def major(root, formula, interval=[]):
 # major('Fb', 'maj7').print()
 # major('Cb', 'maj7').print()
 
-def minor(root, formula, interval=[]):
+def minor(root, formula):
     """
     Returns a minor chord for given root note.
 
@@ -144,7 +144,7 @@ def minor(root, formula, interval=[]):
     formula -- the formula part of chord (e.g. min9)
     interval -- optional custom list of interval to use
     """
-    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
+    if root not in (SHARP_NOTES + FLAT_NOTES):
         print('Note does not exist:', root)
         return
     if formula not in MINOR_FORMULA: 
@@ -156,11 +156,11 @@ def minor(root, formula, interval=[]):
             indices[i] = index - OCTAVE + 1
     root_notes = scale(root)
     notes = [root_notes[i] for i in indices]
-    chord = Chord(root+formula, notes, chromatic(root)).flatThird()
+    minor_chord = Chord(root+formula, notes, chromatic(root)).flat_third()
     # exceptions that don't contain a seventh or shouldn't flat it
     if 'minmaj' in formula or '6' in formula or 'add9' in formula:
-        return chord
-    return chord.flatSeventh()
+        return minor_chord
+    return minor_chord.flat_seventh()
 
 # minor('C', 'min').print()
 # minor('C', 'min7').print()
@@ -169,7 +169,7 @@ def minor(root, formula, interval=[]):
 # invalid
 # minor('D#', 'minmaj9').print()
 
-def dominant(root, formula, interval=[]):
+def dominant(root, formula):
     """
     Returns a dominant chord for given root note.
 
@@ -178,7 +178,7 @@ def dominant(root, formula, interval=[]):
     formula -- the formula part of chord (e.g. min9)
     interval -- optional custom list of interval to use
     """
-    if root not in SHARP_NOTES and root not in FLAT_NOTES: 
+    if root not in (SHARP_NOTES + FLAT_NOTES):
         print('Note does not exist!')
         return
     if formula not in DOMINANT_FORMULA: 
@@ -191,13 +191,13 @@ def dominant(root, formula, interval=[]):
     root_notes = scale(root)
     notes = [root_notes[i] for i in indices]
     
-    chord = Chord(root+formula, notes, chromatic(root))
+    dom_chord = Chord(root+formula, notes, chromatic(root))
     # exceptions that don't contain a seventh or shouldn't flat it
     if '+' in formula:
-        return chord.sharpFifth()
+        return dom_chord.sharp_fifth()
     if 'dim' in formula:
-        return chord.flatThird().flatFifth()
-    return chord.flatSeventh()
+        return dom_chord.flat_third().flat_fifth()
+    return dom_chord.flat_seventh()
 
 # test
 # dominant('Db', '7').print()
@@ -211,7 +211,7 @@ def chord(root, formula):
     root --- the root note (for e.g. C)
     formula --- the type of chord (for e.g. maj)
     """
-    if root not in SHARP_NOTES or root not in FLAT_NOTES: 
+    if root not in (SHARP_NOTES + FLAT_NOTES):
         print('Root note does not exist!')
     if formula in MAJOR_FORMULA:
         return major(root, formula)
@@ -228,46 +228,3 @@ def chord(root, formula):
 # print('C7', chord('C', '7').notes)
 # print('Cdim', chord('C', 'dim').notes)
 # print('C+', chord('C', '+').notes)
-
-# Fretboard
-
-def fretboard():
-    """
-    Returns a dataframe containing all notes for each of the guitar string, where
-    each row is a string and each column is a fret including the open notes.
-    """
-    fretboard = []
-    for i in range(NUM_STRINGS):
-        # NUM_FRETS + 1 because we are counting open string notes as well
-        notes_on_string = chromatic_cycle(GUITAR_STANDARD[i], NUM_FRETS+1)
-        fretboard.insert(0, notes_on_string)
-    return pd.DataFrame(data=fretboard)
-guitar_fretboard = fretboard()
-# print(guitar_fretboard)
-
-def notes_on_fretboard(notes, frets=NUM_FRETS, open=True):
-    """
-    Returns a dataframe containing the notes supplied given a
-    window of frets (for e.g. 4 frets)
-
-    notes --- the notes to find
-    frets --- number of frets to limits search
-    open --- whether to consider open notes or not
-    """
-    # add 1 because we need to consider open notes
-    frets = frets + 1
-    notes = list(notes) if type(notes) != 'list' else notes
-    df = guitar_fretboard
-    start = 0 if open else 1
-    # looks at specified fret window
-    return df[df.iloc[:, start:frets].isin(notes)].iloc[:, start:frets].fillna('.')
-# test
-# show all notes of Cmaj on fretboard 
-# print("Cmaj\n", notes_on_fretboard(major('C', 'maj').notes).to_string())
-# print("Cmaj9\n", notes_on_fretboard(major('C', 'maj9').notes).to_string())
-
-# major scale is good but contains notes isn't sufficient for other scales
-# print("C major scale\n", notes_on_fretboard(scale('C', 'major')).to_string())
-
-# TODO scale finder
-# print("Dorian mode in key of C\n", notes_on_fretboard(mode('C', 'dorian')).to_string())

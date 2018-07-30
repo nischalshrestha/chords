@@ -13,7 +13,7 @@ class test_chords(unittest.TestCase):
     def test_major(self):
         # test a key with all formulas for now
         key = 'C'
-        major_formualas = MAJOR_FORMULA
+        major_formulas = MAJOR_FORMULA
         expected = [
             ['C', 'E', 'G'],
             ['C', 'E', 'G', 'A'],
@@ -24,8 +24,8 @@ class test_chords(unittest.TestCase):
             ['C', 'E', 'G', 'A', 'B'],
             ['C', 'E', 'G', 'B', 'D', 'A']
         ]
-        for i, m in enumerate(major_formualas):
-            self.assertEqual(expected[i], chords.chord(key, m).notes)
+        for i, m in enumerate(major_formulas):
+            self.assertEqual(expected[i], chords.chord(key, m).notes, msg='{}{} is incorrect'.format(key, m))
 
     def test_minor(self):
         # test a key with all formulas for now
@@ -44,7 +44,7 @@ class test_chords(unittest.TestCase):
             ['C', 'Eb', 'G', 'B', 'D'],
         ]
         for i, m in enumerate(minor_formulas):
-            self.assertEqual(expected[i], chords.chord(key, m).notes)
+            self.assertEqual(expected[i], chords.chord(key, m).notes, msg='{}{} is incorrect'.format(key, m))
     
     def test_dominant(self):
         # test a key with all formulas for now
@@ -65,7 +65,7 @@ class test_chords(unittest.TestCase):
             ['C', 'E', 'G#']
         ]
         for i, m in enumerate(minor_formulas):
-            self.assertEqual(expected[i], chords.chord(key, m).notes)
+            self.assertEqual(expected[i], chords.chord(key, m).notes, msg='{}{} is incorrect'.format(key, m))
 
 if __name__ == '__main__':
     unittest.main()

@@ -22,7 +22,7 @@ class Chord:
         self.notes = notes
         self.chromatics = chromatics
     
-    def flatInterval(self, interval):
+    def flat_interval(self, interval):
         index = 0
         if interval == 3:
             index = 1
@@ -42,19 +42,19 @@ class Chord:
             self.notes[index] = note
         return self
 
-    def flatThird(self):
-        return self.flatInterval(3)
+    def flat_third(self):
+        return self.flat_interval(3)
     
-    def flatFifth(self):
-        return self.flatInterval(5)
+    def flat_fifth(self):
+        return self.flat_interval(5)
     
-    def flatSeventh(self):
-        return self.flatInterval(7)
+    def flat_seventh(self):
+        return self.flat_interval(7)
 
-    def sharpFifth(self):
+    def sharp_fifth(self):
         sharp = self.chromatics.index(self.notes[2]) + 1
         if sharp >= len(self.chromatics):
-            sharp = self.chromatics[(sharp) % len(self.chromatics)]
+            sharp = self.chromatics[sharp % len(self.chromatics)]
         note = self.chromatics[sharp]
         self.notes[2] = note
         return self

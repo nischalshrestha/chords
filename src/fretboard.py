@@ -38,28 +38,6 @@ def notes_on_fretboard(notes, frets=NUM_FRETS, open=True):
 
 # TODO scale finder
 c_dorian = notes_on_fretboard(mode('C', 'dorian'))
-c_dorian_notes = mode('C', 'dorian')
-# c_ionian = notes_on_fretboard(mode('C', 'dorian'))
-# c_ionian_notes =
-# v + 1 because we want it to be 1-based for interval
-# c_dorian_dict = {k: v + 1 for (k, v) in zip(c_dorian_notes, c_dorian)}
-
-# print(c_dorian_dict)
-
-# def replace_interval(x, mode_notes):
-#     if x in mode_notes:
-#         return mode_notes.index(x) + 1
-#     return x
-
-# def mode_dict(key, mode_name):
-#     mode_notes = mode(key, mode_name)
-#     mode_neck = notes_on_fretboard(mode_notes)
-#     print(list(mode_neck))
-#     # v + 1 because we want it to be 1-based for interval
-#     print(list(zip(mode_notes, mode_neck)))
-#     return {k: v + 1 for (k, v) in zip(mode_notes, mode_neck)}
-
-# print(mode_dict('C', 'ionian'))
 
 def converter(row, mode_notes):
     """
@@ -133,7 +111,7 @@ for i in reversed(range(NUM_STRINGS)):
             break
     if count == 0:
         tab = tab + 'x'
-# print(tab)
+print(tab)
 
 # for k, v in c_chord.items():
 #     print(k, v, v[0]+1, v[1])

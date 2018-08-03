@@ -5,9 +5,8 @@ sys.path = ['../src'] + sys.path
 import chords
 from Chord import Chord
 from constants import *
-from collections import deque
 
-class test_chords(unittest.TestCase):
+class Test_Chords(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -71,7 +70,7 @@ class test_chords(unittest.TestCase):
 
     def test_inversion_one(self):
         c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
-        self.assertEqual(['E', 'G', 'A', 'C'], c_chord.inversion(1))
+        self.assertEqual(['E', 'G', 'A', 'C'], c_chord.inversion(1), msg='Chord\'s first inversion is incorrect')
 
     def test_inversion_invalid(self):
         c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
@@ -79,11 +78,11 @@ class test_chords(unittest.TestCase):
 
     def test_inversion_two(self):
         c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
-        self.assertEqual(['G', 'A', 'C', 'E'], c_chord.inversion(2))
+        self.assertEqual(['G', 'A', 'C', 'E'], c_chord.inversion(2), msg='Chord\'s second inversion is incorrect')
 
     def test_inversion_three(self):
         c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
-        self.assertEqual(['A', 'C', 'E', 'G'], c_chord.inversion(3))
+        self.assertEqual(['A', 'C', 'E', 'G'], c_chord.inversion(3), msg='Chord\'s third inversion is incorrect')
 
     def test_inversion_three_invalid(self):
         c_chord = Chord('Cmaj7', ['C', 'E', 'G'])

@@ -1,7 +1,5 @@
 # CHORD object encapsulating the name, notes, and the chromatic notes around
 # when embellishing (for e.g. min/dim/7/aug etc)
-from collections import deque
-
 class Chord:
 
     TRIAD = 3
@@ -11,7 +9,6 @@ class Chord:
     FIRST_INVERSION = 1
     SECOND_INVERSION = 2
     THIRD_INVERSION = 3
-
 
     # these will be used to convert between the representations based
     # on whether scale or chord adds accidentals (for e.g. min will use flat)
@@ -77,9 +74,7 @@ class Chord:
             return self.notes
         elif num == self.THIRD_INVERSION and len(self.notes) == self.TRIAD:
             return self.notes
-        chord_notes = deque(self.notes)
-        chord_notes.rotate(-num)
-        return list(chord_notes)
+        return self.notes[num:] + self.notes[:num]
 
     
     def print(self):

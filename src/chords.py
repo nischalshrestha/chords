@@ -222,6 +222,7 @@ def chord(root, formula):
     else:
         print('Chord does not exist or not yet supported!')
 
+
 # test
 # print('Cmaj', chord('C', 'maj').notes)
 # print('Cm', chord('C', 'min').notes)

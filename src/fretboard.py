@@ -93,6 +93,7 @@ print(notes_to_intervals('C', 'ionian').to_string())
 # print("Dorian mode in key of C\n", notes_to_intervals('C', 'dorian').to_string())
 
 # print("Cmaj\n", notes_on_fretboard(major('C', 'maj').notes).to_string())
+
 # Notes:
 # can use inversions to determine unique-enough forms
 # basic rule can be: note per string, repeat a note only once, and quit once you have all notes
@@ -118,6 +119,7 @@ def chord_forms(notes, data, num=1, frets=5):
 
 # print(chord('C', 'maj').notes)
 c_chord = chord_forms(chord('C', 'maj').notes, notes_on_fretboard(major('C', 'maj').notes))
+
 # rough implementation to print tab based on the list of (string, fret) values
 tab = ""
 for i in reversed(range(NUM_STRINGS)):

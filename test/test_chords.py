@@ -3,7 +3,9 @@ import unittest
 import sys
 sys.path = ['../src'] + sys.path
 import chords
+from Chord import Chord
 from constants import *
+from collections import deque
 
 class test_chords(unittest.TestCase):
 
@@ -66,6 +68,26 @@ class test_chords(unittest.TestCase):
         ]
         for i, m in enumerate(minor_formulas):
             self.assertEqual(expected[i], chords.chord(key, m).notes, msg='{}{} is incorrect'.format(key, m))
+
+    def test_inversion_one(self):
+        c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
+        self.assertEqual(['E', 'G', 'A', 'C'], c_chord.inversion(1))
+
+    def test_inversion_invalid(self):
+        c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
+        self.assertEqual(['C', 'E', 'G', 'A'], c_chord.inversion(0))
+
+    def test_inversion_two(self):
+        c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
+        self.assertEqual(['G', 'A', 'C', 'E'], c_chord.inversion(2))
+
+    def test_inversion_three(self):
+        c_chord = Chord('Cmaj7', ['C', 'E', 'G', 'A'])
+        self.assertEqual(['A', 'C', 'E', 'G'], c_chord.inversion(3))
+
+    def test_inversion_three_invalid(self):
+        c_chord = Chord('Cmaj7', ['C', 'E', 'G'])
+        self.assertEqual(['C', 'E', 'G'], c_chord.inversion(3))
 
 if __name__ == '__main__':
     unittest.main()

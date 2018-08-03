@@ -1,10 +1,17 @@
 # CHORD object encapsulating the name, notes, and the chromatic notes around
 # when embellishing (for e.g. min/dim/7/aug etc)
+from collections import deque
+
 class Chord:
 
     TRIAD = 3
     FOUR_NOTE = 4
     SEVENTH = 7
+
+    FIRST_INVERSION = 1
+    SECOND_INVERSION = 2
+    THIRD_INVERSION = 3
+
 
     # these will be used to convert between the representations based
     # on whether scale or chord adds accidentals (for e.g. min will use flat)
@@ -21,7 +28,7 @@ class Chord:
         self.name = name
         self.notes = notes
         self.chromatics = chromatics
-    
+
     def flat_interval(self, interval):
         index = 0
         if interval == 3:
@@ -58,6 +65,22 @@ class Chord:
         note = self.chromatics[sharp]
         self.notes[2] = note
         return self
+
+    def inversion(self, num):
+        """
+        Return an inversion of a chord as a list of notes.
+
+        :param chord:
+        :return:
+        """
+        if num < self.FIRST_INVERSION or num > self.THIRD_INVERSION:
+            return self.notes
+        elif num == self.THIRD_INVERSION and len(self.notes) == self.TRIAD:
+            return self.notes
+        chord_notes = deque(self.notes)
+        chord_notes.rotate(-num)
+        return list(chord_notes)
+
     
     def print(self):
         print(self.name, ': ', self.notes)
